@@ -15,8 +15,18 @@ public class GamepadContoller : MonoBehaviour {
 	
 	}
 	
+    bool ButtonPressed()
+    {
+        //if(Input.GetButton)
+        return false;
+    }
 	// Update is called once per frame
 	void Update () {
-        player.velocity = Vector3.zero + (new Vector3(Input.GetAxis("Horizontal"), 0, Input.GetAxis("Vertical")) * Time.deltaTime);
+        player.velocity = Vector3.zero + (new Vector3(Input.GetAxis("Horizontal"), 0, Input.GetAxis("Vertical")));
+
+        if(Input.GetButton("Call"))
+        {
+            player.SendCall();
+        }
 	}
 }
