@@ -73,7 +73,7 @@ public class CrowdController : MonoBehaviour {
 		}
 		for (int i = 0; i < _dummyAiStateInfoCount; ++i)
 		{
-			if (i < _dummyAiStateInfoCount)
+			if (i < oldDummyAiStateInfoCount)
 			{
 				_dummyAiStateInfos[i] = oldDummyAiStateInfos[i];
 			}
