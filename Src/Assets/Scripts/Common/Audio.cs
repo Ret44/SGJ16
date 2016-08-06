@@ -5,13 +5,22 @@ public class Audio : MonoBehaviour
 {
 	#region Variables
 
+	[SerializeField]
+	private Transform _transform = null;
+
 	private static Audio _instance = null;
 	public static Audio Instance { get { return _instance; } }
 
-	private AudioSource[] _sources = null;
-	private int _sourceCount = 24;
-
 	private int _nextSourceIndexToUse = 0;
+
+	private AudioSourceObjectPool _audioSourceObjectPool = null;
+
+	private Transform _playerCameraTransform = null;
+
+	private AudioSource _musicSource = null;
+
+	[SerializeField]
+	private AudioClip _music = null;
 
 	#endregion Variables
 
@@ -22,6 +31,11 @@ public class Audio : MonoBehaviour
 		Initialize();
 	}
 
+	void Update()
+	{
+
+	}
+
 	#endregion Monobehaviour Methods
 
 	#region Methods
@@ -30,23 +44,46 @@ public class Audio : MonoBehaviour
 	{
 		Audio._instance = this;
 
-		_sources = new AudioSource[_sourceCount];
-		for(int i = 0;i < _sourceCount;++i)
+		_audioSourceObjectPool = new AudioSourceObjectPool(_transform, 24);
+
+		if (_music)
 		{
-			_sources[i] = this.gameObject.AddComponent<AudioSource>();
+			_musicSource = this.gameObject.AddComponent<AudioSource>();
+			_musicSource.loop = true;
+			_musicSource.Play();
+			_musicSource.volume = 0.0f;
 		}
 	}
 
 	private void DisableAllSound()
 	{
-		for(int i = 0;i < _sourceCount;++i)
-		{
-			_sources[i].Stop();
-		}
-		_nextSourceIndexToUse = 0;
+		_audioSourceObjectPool.StopAllSources();
 	}
 
-	public AudioSource PlaySound(AudioClip[] clips,float volume = 1.0f)
+	public AudioSource PlaySound(AudioClip[] clips, float volume = 1.0f)
+	{
+		AudioSource usedSource = null;
+
+		int clipCount = 0;
+
+		if (clips != null && (clipCount = clips.Length) > 0)
+		{
+			int clipToPlay = UnityEngine.Random.Range(0, clipCount);
+
+			usedSource = _audioSourceObjectPool.GetPooledObject();
+
+			usedSource.transform.parent = _transform;
+			usedSource.transform.localPosition = Vector3.zero;
+
+			usedSource.clip = clips[clipToPlay];
+			usedSource.volume = volume;
+			usedSource.Play();
+		}
+
+		return usedSource;
+	}
+
+	public AudioSource PlaySound(AudioClip[] clips, Vector3 position ,float volume = 1.0f)
 	{
 		AudioSource usedSource = null;
 
@@ -56,9 +93,10 @@ public class Audio : MonoBehaviour
 		{
 			int clipToPlay = UnityEngine.Random.Range(0, clipCount);
 
-			usedSource = _sources[_nextSourceIndexToUse];
+			usedSource = _audioSourceObjectPool.GetPooledObject();
 
-			_nextSourceIndexToUse = (_nextSourceIndexToUse + 1) % _sourceCount;
+			usedSource.transform.parent = null;
+			usedSource.transform.position = position;
 
 			usedSource.clip = clips[clipToPlay];
 			usedSource.volume = volume;
@@ -66,6 +104,14 @@ public class Audio : MonoBehaviour
 		}
 
 		return usedSource;
+	}
+
+	public void SetMusicVolume(float volume)
+	{
+		if(_musicSource != null)
+		{
+			_musicSource.volume = volume;
+		}
 	}
 
 	#endregion Methods

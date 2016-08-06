@@ -24,6 +24,13 @@ public class MemberObjectPool
 		_prefab = prefab;
 		_parent = parent;
 		_size = initialSize;
+		_pool = new GameObject[_size];
+		for(int i = 0;i < _size;++i)
+		{
+			_pool[i] = GameObject.Instantiate<GameObject>(_prefab);
+			_pool[i].transform.parent = _parent;
+			_pool[i].SetActive(false);
+		}
 	}
 
 	public GameObject GetPooledObject()
@@ -55,6 +62,14 @@ public class MemberObjectPool
         }
 
 		return result;
+	}
+
+	public void DisableAllObjects()
+	{
+		for(int i = 0;i < _size;++i)
+		{
+			_pool[i].SetActive(false);
+		}
 	}
 
 	#endregion Methods
