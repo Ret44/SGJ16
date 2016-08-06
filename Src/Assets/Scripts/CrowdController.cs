@@ -2,9 +2,11 @@
 using System.Collections;
 using System.Collections.Generic;
 
-public class CrowdController : MonoBehaviour {
+public class CrowdController : MonoBehaviour
+{
+	#region Variables
 
-    public static CrowdController instance;
+	public static CrowdController instance;
     public Dummy[] dummies;
 	private int _dummyCount = 0;
 
@@ -28,6 +30,10 @@ public class CrowdController : MonoBehaviour {
 	private float _soundIntervalMin = 0.3f;
 	private float _soundIntervalMax = 0.6f;
 
+	#endregion Variables
+
+	#region Monobehaviour Methods
+
 	void Awake()
     {
         instance = this;
@@ -35,31 +41,28 @@ public class CrowdController : MonoBehaviour {
 
 		_dummyCount = dummies.Length;
     }
-
-    public static void ResetAll()
-    {
-        for(int i =0 ; i< instance.dummies.Length; i++)
-        {
-            instance.dummies[i].reset();
-        }
-    }
-	// Use this for initialization
-	void Start ()
-    {
-	    
-	}
-	
+		
 	void OnValidate()
 	{
 		Validate();
 	}
 
-	// Update is called once per frame
-	void Update () {
+	void Update ()
+	{
 		ProcessCrowdSounds();
     }
 
+	#endregion Monobehaviour Methods
+
 	#region Methods
+
+	public static void ResetAll()
+	{
+		for (int i = 0; i < instance.dummies.Length; i++)
+		{
+			instance.dummies[i].reset();
+		}
+	}
 
 	public void Validate()
 	{
@@ -105,22 +108,13 @@ public class CrowdController : MonoBehaviour {
             }
 		}
 
+		float bennyFactor = Mathf.Clamp01( _dummyAiStateInfos[(int)DummyAIState.Follow].stateCount / (float)_dummyCount );
+		Audio.Instance.SetMusicVolume(bennyFactor);
+
 		if(currentMaxStateIndex != -1)
 		{
 			DummyAIState choosenState = (DummyAIState)currentMaxStateIndex;
-			switch(choosenState)
-			{
-				case DummyAIState.Idle:
-					break;
-				case DummyAIState.Heard:
-					break;
-				case DummyAIState.Follow:
-					break;
-				case DummyAIState.Confusion:
-					break;
-				case DummyAIState.Wow:
-					break;
-			}
+
 
 			if(_lastChoosenDummyAIState == choosenState)
 			{
