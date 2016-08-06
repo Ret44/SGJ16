@@ -28,6 +28,7 @@ public class GameLord : MonoBehaviour
 		{
 			if(_instance == null)
 			{
+				Debug.LogWarningFormat("load start");
 				SceneManager.LoadScene(startSceneName, LoadSceneMode.Additive);
 			}
 			return GameLord._instance;
@@ -86,7 +87,8 @@ public class GameLord : MonoBehaviour
 
 	private AsyncOperation _loadingAsyncOperation = null;
 	private int _targetLevelIndex = -1;
-	private int _currentSceneIndex = -1;
+	private int _currentLevelIndex = -1;
+	public int CurrentLevelIndex { get { return _currentLevelIndex; } }
 	private string _currentSceneName = "";
 	public const string startSceneName = "Start";
 
@@ -116,6 +118,8 @@ public class GameLord : MonoBehaviour
 
 	private void Validate()
 	{
+		_sceneNameCount = _sceneNames.Length;
+
 		_stateCount = (int)AppState.AS_COUNT;
 		StateInfo[] oldPanelInfos = _stateInfos;
 		int oldPanelCount = oldPanelInfos != null ? oldPanelInfos.Length : 0;
@@ -149,11 +153,12 @@ public class GameLord : MonoBehaviour
 			bool foundAny = false;
 			for(int i = 0;i < _sceneNameCount;++i)
 			{
+				//Debug.LogWarningFormat("Check \"{0}\" with \"{1}\"", _sceneNames[i], loadedSceneName);
 				if(_sceneNames[i] == loadedSceneName)
 				{
 					foundAny = true;
-					_currentSceneIndex = i;
-					_currentGameState = AppState.AS_GAME;
+					_currentLevelIndex = i;
+					ChangeGameState(AppState.AS_GAME,true);
 					break;
 				}
 			}
@@ -168,6 +173,8 @@ public class GameLord : MonoBehaviour
 		{
 			_stateInfos[i].panelGO.SetActive(_stateInfos[i].state == _currentGameState);
 		}
+
+		UpdateTimeScale();
 	}
 
 	public void LoadLevel(int index)
@@ -181,31 +188,57 @@ public class GameLord : MonoBehaviour
 		ChangeGameState(AppState.AS_MENU);
 	}
 
-	private void ChangeGameState(AppState newGameState)
+	public void NextLevel()
 	{
-		if(newGameState != _currentGameState)
+		if(_currentLevelIndex + 1 < _sceneNameCount)
 		{
-			if (_currentTransitionState == TransitionState.TS_NONE)
-			{
-				_targetGameState = newGameState;
-				_currentTransitionState = TransitionState.TS_OUT;
-			} else {
+			LoadLevel(_currentLevelIndex + 1);
+		} else {
+			BackToMenu();
+		}
+	}
 
-				_targetGameState = newGameState;
-				if (_currentTransitionState == TransitionState.TS_OUT)
+	private void ChangeGameState(AppState newGameState, bool instant = false)
+	{
+		if (instant)
+		{
+			_currentGameState = newGameState;
+			NotifyOnGameStateChanged();
+		}
+		else
+		{
+			if (newGameState != _currentGameState)
+			{
+				if (_currentTransitionState == TransitionState.TS_NONE)
 				{
-					//do nth
-				} else {
+					_targetGameState = newGameState;
 					_currentTransitionState = TransitionState.TS_OUT;
 				}
+				else
+				{
+
+					_targetGameState = newGameState;
+					if (_currentTransitionState == TransitionState.TS_OUT)
+					{
+						//do nth
+					}
+					else
+					{
+						_currentTransitionState = TransitionState.TS_OUT;
+					}
+				}
 			}
-		} else{
-			//it's the same state
-			if(_currentTransitionState == TransitionState.TS_OUT)
+			else
 			{
-				_currentTransitionState = TransitionState.TS_IN;
-			} else {
-				// do nth
+				//it's the same state
+				if (_currentTransitionState == TransitionState.TS_OUT)
+				{
+					_currentTransitionState = TransitionState.TS_IN;
+				}
+				else
+				{
+					// do nth
+				}
 			}
 		}
 	}
@@ -221,19 +254,32 @@ public class GameLord : MonoBehaviour
 			case AppState.AS_LOADING:
 				if(_targetLevelIndex != -1)
 				{
-					if(_currentSceneIndex != -1)
+					if(_currentLevelIndex != -1)
 					{
-						SceneManager.UnloadScene(_sceneNames[_currentSceneIndex]);
+						Debug.LogWarningFormat("Unload scene: {0}", _sceneNames[_currentLevelIndex]);
+						SceneManager.UnloadScene(_sceneNames[_currentLevelIndex]);
 
 						Resources.UnloadUnusedAssets();
 					}
 
-					_loadingAsyncOperation = SceneManager.LoadSceneAsync(_sceneNames[_targetLevelIndex], LoadSceneMode.Additive);
-					_targetLevelIndex = -1;
+					_currentSceneName = _sceneNames[_targetLevelIndex];
+					_loadingAsyncOperation = SceneManager.LoadSceneAsync(_currentSceneName, LoadSceneMode.Additive);
+					_currentLevelIndex = _targetLevelIndex;
+                    _targetLevelIndex = -1;
 				} else {
 
 					if(_loadingAsyncOperation != null && _loadingAsyncOperation.isDone)
 					{
+						for(int i = 0;i < SceneManager.sceneCount;++i)
+						{
+							UnityEngine.SceneManagement.Scene tmpScene = SceneManager.GetSceneAt(i);
+							if(tmpScene.name == _currentSceneName)
+							{
+								SceneManager.SetActiveScene(tmpScene);
+								break;
+							}
+                        }
+						
 						ChangeGameState(AppState.AS_GAME);
 					}
 				}
@@ -245,7 +291,7 @@ public class GameLord : MonoBehaviour
 
 	private void ProcessTransition()
 	{
-		float deltaTime = Time.deltaTime;
+		float deltaTime = Time.unscaledDeltaTime;
 		switch(_currentTransitionState)
 		{
 			case TransitionState.TS_NONE:
@@ -308,9 +354,36 @@ public class GameLord : MonoBehaviour
 
 	private void NotifyOnGameStateChanged()
 	{
+		UpdateTimeScale();
+
 		if (OnGameStateChanged != null)
 		{
 			OnGameStateChanged(_currentGameState);
+		}
+	}
+
+	public void UpdateTimeScale()
+	{
+		Debug.LogWarningFormat("Update time scale ({0})", _currentGameState);
+		switch(_currentGameState)
+		{
+			case AppState.AS_GAME:
+				{
+					GameManager gameManagerInstance = GameManager.Instance;
+					if (gameManagerInstance != null)
+					{
+						gameManagerInstance.UpdateTimeScale();
+					} else {
+						Debug.LogWarningFormat("No game manager");
+					}
+				}
+				break;
+			case AppState.AS_MENU:
+				Time.timeScale = 0.0f;
+				break;
+			case AppState.AS_LOADING:
+				Time.timeScale = 0.0f;
+				break;
 		}
 	}
 

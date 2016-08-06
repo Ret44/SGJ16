@@ -27,7 +27,7 @@ public class MenuController_Single : MonoBehaviour
 		MenuLord menuLordInstance = MenuLord.Instance;
 		if (menuLordInstance != null)
 		{
-			menuLordInstance.ChangeMenuState(MenuLord.MenuState.MS_SINGLE);
+			menuLordInstance.ChangeMenuState(MenuLord.MenuState.MS_MAIN);
 		}
 	}
 
