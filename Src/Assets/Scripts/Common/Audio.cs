@@ -44,7 +44,28 @@ public class Audio : MonoBehaviour
 	{
 		Audio._instance = this;
 
+        UnityEngine.SceneManagement.Scene startScene = new UnityEngine.SceneManagement.Scene();
+		int sceneCount = UnityEngine.SceneManagement.SceneManager.sceneCount;
+		for(int i = 0;i < sceneCount;++i)
+		{
+			UnityEngine.SceneManagement.Scene tmpScene = UnityEngine.SceneManagement.SceneManager.GetSceneAt(i);
+
+            if (tmpScene.name == GameLord.startSceneName)
+			{
+				startScene = tmpScene;
+				break;
+			}
+		}
+
+		
+
 		_audioSourceObjectPool = new AudioSourceObjectPool(_transform, 24);
+		int sourceCount = _audioSourceObjectPool.Size;
+		AudioSource[] sources = _audioSourceObjectPool.Pool;
+		for(int i = 0;i < sourceCount;++i)
+		{
+			UnityEngine.SceneManagement.SceneManager.MoveGameObjectToScene(sources[i].gameObject, startScene);
+		}
 
 		if (_music)
 		{

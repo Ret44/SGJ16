@@ -18,6 +18,9 @@ public class Player : MonoBehaviour {
     public GameObject objective;
     public SphereCollider sphereCollider;
 
+	[SerializeField]
+	private AudioClip[] _sounds_comeWithMe = null;
+
     public void Awake()
     {
         instance = this;
@@ -44,6 +47,8 @@ public class Player : MonoBehaviour {
 
             sphereCollider.enabled = true;
             playerModel.transform.DOScale(0.5f, 0.25f).SetEase(Ease.InBounce).OnComplete(ModelTweenEnd);
+
+			Audio.Instance.PlaySound(_sounds_comeWithMe);
         }
     }
 
