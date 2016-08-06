@@ -5,7 +5,7 @@ public class AttractionController : MonoBehaviour {
 
     public bool Deadly;
     public Rigidbody rBody;
-
+    public float mag;
 
     public void OnCollisionEnter(Collision collision)
     {
@@ -19,9 +19,15 @@ public class AttractionController : MonoBehaviour {
         }
         else
         {
-            if (rBody.velocity.magnitude > 3)
+            if (rBody.velocity.magnitude > 0.75f && collision.collider.gameObject.layer == LayerMask.NameToLayer("Dummies"))
             {
-
+                Dummy tmpDummy = collision.collider.transform.GetComponent<Dummy>();
+                if(tmpDummy != null)
+                {
+                    tmpDummy.Die();
+                } else {
+                    Debug.LogWarningFormat("Dummy not found in: {0}", collision.collider.gameObject.name);
+                }
             }
         }
     }
@@ -38,6 +44,6 @@ public class AttractionController : MonoBehaviour {
 	
 	// Update is called once per frame
 	void Update () {
-	
+        mag = rBody.velocity.magnitude;
 	}
 }

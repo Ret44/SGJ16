@@ -33,6 +33,21 @@ public class Dummy : MonoBehaviour {
     {
         this.transform.position = startPosition;
         AiState = DummyAIState.Idle;
+        dead = false;
+    }
+
+    public void Die()
+    {
+        if(!dead)
+        {
+            dead = true;
+            dummyModel.DOScaleX(0.4f, 0.1f);
+            dummyModel.DOScaleZ(0.01f, 0.1f);
+            dummyModel.DOLocalRotate(new Vector3(-90f, 0f, 0f), 0.1f);
+            dummyModel.DOLocalMoveY(-0.25f, 0.1f);
+//            ParticleController.SpawnBlood(this.transform.position);
+
+        }
     }
 
     public void FollowPoint()
@@ -54,7 +69,7 @@ public class Dummy : MonoBehaviour {
     
     public void OnTriggerEnter(Collider other)
     {
-        if(other.tag == "Call")
+        if(other.tag == "Call" && !dead)
         {
         //    RaycastHit hit;
           //  if(Physics.Raycast(this.transform.position, other.transform.position, out hit))
