@@ -7,6 +7,7 @@ public enum DummyAIState
     Heard,
     Follow,
     Confusion,
+    Wow
 }
 public class Dummy : MonoBehaviour {
 
@@ -21,6 +22,8 @@ public class Dummy : MonoBehaviour {
     private Rigidbody rBody;
     private Vector3 targetScale;
     public Transform dummyModel;
+
+    
 
 	// Use this for initialization
 	void Start () {
