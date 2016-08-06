@@ -1,13 +1,16 @@
 ﻿using UnityEngine;
 using System.Collections;
 using DG.Tweening;
-public enum DummyAIState
+public enum DummyAIState : int
 {
-    Idle,
+    Idle = 0,
     Heard,
     Follow,
     Confusion,
-    Wow
+    Wow,
+
+	Count,
+	None
 }
 public class Dummy : MonoBehaviour {
 

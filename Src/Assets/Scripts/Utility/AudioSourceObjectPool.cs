@@ -27,7 +27,7 @@ public class AudioSourceObjectPool : MonoBehaviour
 		{
 			GameObject tmpGameObject = new GameObject( string.Format("Source_{0}", i) );
 			_pool[i] = tmpGameObject.AddComponent<AudioSource>();
-            _pool[i].transform.parent = _parent;
+            _pool[i].transform.SetParent(_parent);
 		}
 	}
 
