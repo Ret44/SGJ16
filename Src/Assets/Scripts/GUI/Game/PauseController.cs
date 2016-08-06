@@ -23,17 +23,12 @@ public class PauseController : MonoBehaviour
     }
 	public void ClickRestart()
 	{
-		bool reload = true;
-		if (reload)
+		GameManager gameManagerIstance = GameManager.Instance;
+		if (gameManagerIstance != null)
 		{
-			GameManager gameManagerIstance = GameManager.Instance;
-			if (gameManagerIstance != null)
-			{
-				gameManagerIstance.RestartLevel();
-			}
-		} else {
-			GameLord.Instance.LoadLevel(GameLord.Instance.CurrentLevelIndex);
+			gameManagerIstance.RestartLevel();
 		}
+
 	}
 	public void ClickMenu()
 	{

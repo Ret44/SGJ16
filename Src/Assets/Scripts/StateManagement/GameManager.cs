@@ -91,14 +91,22 @@ public class GameManager : MonoBehaviour
 
 	public void RestartLevel()
 	{
-		if(_player != null)
-		{
-			//_player.ResetPlayer();
-		}
-		
-		CrowdController.ResetAll();
 
-		ChangeGameState(GameState.GS_WARM_UP);
+
+		bool reload = true;
+		if (reload)
+		{
+			GameLord.Instance.LoadLevel(GameLord.Instance.CurrentLevelIndex);
+		} else {
+			if (_player != null)
+			{
+				//_player.ResetPlayer();
+			}
+
+			CrowdController.ResetAll();
+
+			ChangeGameState(GameState.GS_WARM_UP);
+		}
 	}
 
 	private void ProcessGameStates()
