@@ -17,6 +17,7 @@ public class Dummy : MonoBehaviour {
     public float idleSpeed;
     public float speed;
     public DummyAIState AiState;
+    public bool dead;
     private Rigidbody rBody;
     private Vector3 targetScale;
     public Transform dummyModel;
@@ -40,14 +41,34 @@ public class Dummy : MonoBehaviour {
        
     }
 
+    public void OnCollisionEnter(Collision collision)
+    {
+        if (collision.collider.gameObject.layer == LayerMask.NameToLayer("Player"))
+        {
+           if(this.speed > Player.instance.speed)
+           {
+               Player.instance.HP -= 10;
+           }
+        }
+    }    
+    
     public void OnTriggerEnter(Collider other)
     {
         if(other.tag == "Call")
         {
-            AiState = DummyAIState.Follow;
-            followPosition = other.gameObject.transform.parent.position;
-            this.transform.LookAt(followPosition);
-            speed = runningSpeed;
+        //    RaycastHit hit;
+          //  if(Physics.Raycast(this.transform.position, other.transform.position, out hit))
+        //    {
+        //        if(hit.transform.gameObject.layer == LayerMask.NameToLayer("Player"))
+        // //       {
+                    AiState = DummyAIState.Follow;
+                    followPosition = other.gameObject.transform.parent.position;
+                    this.transform.LookAt(followPosition);
+                    speed = runningSpeed;
+          //      }
+         //   }
+
+           
           //  dummyModel.transform.DOScale(new Vector3(0.5f, 1.2f, 0.5f), 0.15f).SetEase(Ease.InBounce).OnComplete(FollowPoint);
         }
     }
@@ -56,25 +77,28 @@ public class Dummy : MonoBehaviour {
 	// Update is called once per frame
     void Update()
     {
-      //  GetComponent<Rigidbody>().angularDrag = 0;
-        if (AiState == DummyAIState.Idle)
+        if (!dead)
         {
-            speed = idleSpeed;
-            Vector3 dir = Random.insideUnitSphere * 2;
-            velocity = new Vector3(Mathf.Lerp(velocity.x, dir.x, 0.1f), 0f, Mathf.Lerp(velocity.z, dir.z, 0.1f));
-            this.transform.Translate(velocity * speed * Time.deltaTime);
-            this.transform.rotation = Quaternion.Lerp(this.transform.rotation, Quaternion.LookRotation(velocity), 0.01f);
+            //  GetComponent<Rigidbody>().angularDrag = 0;
+            if (AiState == DummyAIState.Idle)
+            {
+                speed = idleSpeed;
+                Vector3 dir = Random.insideUnitSphere * 2;
+                velocity = new Vector3(Mathf.Lerp(velocity.x, dir.x, 0.1f), 0f, Mathf.Lerp(velocity.z, dir.z, 0.1f));
+                this.transform.Translate(velocity * speed * Time.deltaTime);
+                this.transform.rotation = Quaternion.Lerp(this.transform.rotation, Quaternion.LookRotation(velocity), 0.01f);
+            }
+            if (AiState == DummyAIState.Follow)
+            {
+                rBody.MovePosition(transform.position + transform.forward * speed * Time.deltaTime);
+                rBody.velocity = Vector3.zero;
+                //  this.transform.Translate(transform.forward * speed * Time.deltaTime, Space.World);
+                // this.transform.rotation = Quaternion.Lerp(this.transform.rotation, Quaternion.LookRotation(velocity), 0.01f);
+                speed -= 0.01f;
+                if (speed <= idleSpeed)
+                    AiState = DummyAIState.Idle;
+            }
+            dummyModel.localPosition = Vector3.zero;
         }
-        if(AiState == DummyAIState.Follow)
-        {
-            rBody.MovePosition(transform.position + transform.forward * speed * Time.deltaTime);
-            rBody.velocity = Vector3.zero;
-          //  this.transform.Translate(transform.forward * speed * Time.deltaTime, Space.World);
-            // this.transform.rotation = Quaternion.Lerp(this.transform.rotation, Quaternion.LookRotation(velocity), 0.01f);
-            speed -= 0.01f;
-            if (speed <= idleSpeed)
-                AiState = DummyAIState.Idle;
-        }
-        dummyModel.localPosition = Vector3.zero;
     }
 }
