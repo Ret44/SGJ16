@@ -60,7 +60,7 @@ public class CrowdController : MonoBehaviour
 	{
 		for (int i = 0; i < instance.dummies.Length; i++)
 		{
-			instance.dummies[i].reset();
+			instance.dummies[i].ResetDummy();
 		}
 	}
 
@@ -94,6 +94,7 @@ public class CrowdController : MonoBehaviour
 		for(int i = 0;i <_dummyCount;++i)
 		{
 			int dummyStateIndex = (int)dummies[i].AiState;
+			
 			++_dummyAiStateInfos[dummyStateIndex].stateCount;
 		}
 
