@@ -1,7 +1,7 @@
 ﻿using UnityEngine;
 using System.Collections;
 
-public class MenuController_Single : MonoBehaviour
+public class MenuController_Credits : MonoBehaviour
 {
 	#region Variables
 
@@ -13,19 +13,10 @@ public class MenuController_Single : MonoBehaviour
 
 	#region Methods
 
-	public void ClickPlayLevel(int index)
-	{
-		GameLord gameLordInstance = GameLord.Instance;
-		if (gameLordInstance != null)
-		{
-			gameLordInstance.LoadLevel(index);
-		}
-	}
-
 	public void ClickBack()
 	{
 		MenuLord menuLordInstance = MenuLord.Instance;
-		if (menuLordInstance != null)
+		if(menuLordInstance != null)
 		{
 			menuLordInstance.ChangeMenuState(MenuLord.MenuState.MS_MAIN);
 		}

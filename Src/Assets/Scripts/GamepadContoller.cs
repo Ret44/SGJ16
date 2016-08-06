@@ -24,7 +24,11 @@ public class GamepadContoller : MonoBehaviour {
 	void Update () {
         player.velocity = Vector3.zero + (new Vector3(Input.GetAxis("Horizontal"), 0, Input.GetAxis("Vertical")));
 
-        if(Input.GetButtonDown("Call"))
+        if(Input.GetButtonDown("Call")
+#if UNITY_EDITOR
+			|| Input.GetKeyDown(KeyCode.Space)
+#endif
+			)
         {
             player.SendCall();
         }

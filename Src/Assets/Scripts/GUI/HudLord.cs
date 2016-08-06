@@ -8,7 +8,7 @@ public class HudLord : MonoBehaviour
 	private static HudLord _instance = null;
 	public static HudLord Instance {  get { return _instance; } }
 
-	private GameManager.GameState _currentHudState = GameManager.GameState.HS_NONE;
+	private GameManager.GameState _currentHudState = GameManager.GameState.GS_NONE;
 	public GameManager.GameState CurrentHudState { get { return _currentHudState; } }
 
 	[System.Serializable]
@@ -23,6 +23,8 @@ public class HudLord : MonoBehaviour
 	[HideInInspector]
 	[SerializeField]
 	private int _hudStateCount = 0;
+
+	private bool _eventsConnected = false;
 
 	#endregion Variables
 
@@ -40,11 +42,11 @@ public class HudLord : MonoBehaviour
 	{
 		ResetHudLord();
 
-		GameManager.OnGameStateChanged += HandleGameState;
+		ConnectEvents(true);
 	}
 	void OnDisable()
 	{
-		GameManager.OnGameStateChanged -= HandleGameState;
+		ConnectEvents(false);
 	}
 	#endregion Monobehaviour Methods
 
@@ -54,7 +56,7 @@ public class HudLord : MonoBehaviour
 	{
 		HudStateInfo[] oldHudStateInfos = _hudStateInfos;
 		int oldHudStateInfoCount = oldHudStateInfos != null ? oldHudStateInfos.Length : 0;
-		_hudStateCount = (int)GameManager.GameState.HS_COUNT;
+		_hudStateCount = (int)GameManager.GameState.GS_COUNT;
 
 		if(oldHudStateInfoCount != _hudStateCount)
 		{
@@ -72,12 +74,20 @@ public class HudLord : MonoBehaviour
 
 	private void InitHudLord()
 	{
+		ConnectEvents(true);
+
 		HudLord._instance = this;
 	}
 
 	private void ResetHudLord()
 	{
-		_currentHudState = GameManager.GameState.HS_NONE;
+		GameManager gameManagerInstace = GameManager.Instance;
+		if(gameManagerInstace != null)
+		{
+			_currentHudState = gameManagerInstace.CurrentGameState;
+		} else {
+			_currentHudState = GameManager.GameState.GS_NONE;
+		}
 		for(int i = 0;i < _hudStateCount;++i)
 		{
 			_hudStateInfos[i].panelGO.SetActive(_hudStateInfos[i].state == _currentHudState);
@@ -103,6 +113,20 @@ public class HudLord : MonoBehaviour
 	private void HandleGameState(GameManager.GameState gameState)
 	{
 		ChangeHudState(gameState);
+	}
+
+	private void ConnectEvents(bool state)
+	{
+		if (state && !_eventsConnected)
+		{
+			GameManager.OnGameStateChanged += HandleGameState;
+		}
+		if (!state && _eventsConnected)
+		{
+			GameManager.OnGameStateChanged -= HandleGameState;
+		}
+
+		_eventsConnected = state;
 	}
 
 	#endregion Methods
