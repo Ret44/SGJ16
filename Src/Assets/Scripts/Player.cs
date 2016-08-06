@@ -15,7 +15,7 @@ public class Player : MonoBehaviour {
     public Vector3 velocity;
 
     public Vector3 targetScale;
-
+    public GameObject objective;
     public SphereCollider sphereCollider;
 
     public void Awake()
