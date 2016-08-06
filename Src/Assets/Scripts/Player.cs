@@ -15,7 +15,9 @@ public class Player : MonoBehaviour {
     public Vector3 velocity;
 
     public Vector3 targetScale;
-    
+
+    public SphereCollider sphereCollider;
+
     public void Awake()
     {
         instance = this;
@@ -25,6 +27,7 @@ public class Player : MonoBehaviour {
     public void CallEnd()
     {
         sphereTransform.localScale = new Vector3(0f, 1f, 0f);
+        sphereCollider.enabled = false;
     }
 
     public void ModelTweenEnd()
@@ -37,6 +40,7 @@ public class Player : MonoBehaviour {
         sphereTransform.DOScaleX(range, 0.5f);
         sphereTransform.DOScaleZ(range, 0.5f).OnComplete(CallEnd);
 
+        sphereCollider.enabled = true;
         playerModel.transform.DOScale(0.5f, 0.25f).SetEase(Ease.InBounce).OnComplete(ModelTweenEnd);
     }
 
