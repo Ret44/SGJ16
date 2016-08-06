@@ -26,7 +26,10 @@ public class Dummy : MonoBehaviour {
     private Vector3 targetScale;
     public Transform dummyModel;
 
-    
+    public float wowStateTimer;
+    public float wowStateTimer2;
+
+       
 
 	// Use this for initialization
 	void Start () {
@@ -92,6 +95,13 @@ public class Dummy : MonoBehaviour {
            
           //  dummyModel.transform.DOScale(new Vector3(0.5f, 1.2f, 0.5f), 0.15f).SetEase(Ease.InBounce).OnComplete(FollowPoint);
         }
+        if(other.tag == "Objective" && !dead)
+        {
+            AiState = DummyAIState.Wow;
+            wowStateTimer = 8f;
+            wowStateTimer = 2f;
+            dummyModel.LookAt(other.transform.position);
+        }
     }
 
     	
@@ -119,7 +129,22 @@ public class Dummy : MonoBehaviour {
                 if (speed <= idleSpeed)
                     AiState = DummyAIState.Idle;
             }
+            if (AiState == DummyAIState.Wow)
+            {
+                wowStateTimer -= Time.deltaTime;
+                wowStateTimer2 -= Time.deltaTime;
+                if (wowStateTimer2 < 0f)
+                {
+                    dummyModel.DORotate(new Vector3(this.transform.localEulerAngles.x, this.transform.localEulerAngles.y + Random.Range(-25, 25), this.transform.localEulerAngles.z), 1f);
+                    wowStateTimer2 = 2f;
+                }
+                if (wowStateTimer < 0f)
+                {
+                    AiState = DummyAIState.Idle;
+                }
+            }
             dummyModel.localPosition = Vector3.zero;
+            
         }
     }
 }
