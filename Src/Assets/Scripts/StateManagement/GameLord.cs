@@ -229,6 +229,7 @@ public class GameLord : MonoBehaviour
 					}
 
 					_loadingAsyncOperation = SceneManager.LoadSceneAsync(_sceneNames[_targetLevelIndex], LoadSceneMode.Additive);
+					_targetLevelIndex = -1;
 				} else {
 
 					if(_loadingAsyncOperation != null && _loadingAsyncOperation.isDone)
@@ -282,8 +283,8 @@ public class GameLord : MonoBehaviour
 					_transitionTimer = 0.0f;
 					_currentTransitionState = TransitionState.TS_NONE;
 
-					OnGameStateChanged(_currentGameState);
-				} else {
+					NotifyOnGameStateChanged();
+                } else {
 					if (!_fader.gameObject.activeSelf)
 					{
 						_fader.gameObject.SetActive(true);
@@ -303,6 +304,14 @@ public class GameLord : MonoBehaviour
 		{
 			_stateInfos[index].panelGO.SetActive(active);
         }
+	}
+
+	private void NotifyOnGameStateChanged()
+	{
+		if (OnGameStateChanged != null)
+		{
+			OnGameStateChanged(_currentGameState);
+		}
 	}
 
 	#endregion Methods
