@@ -34,14 +34,14 @@ public class GameLord : MonoBehaviour
 		}
 	}
 
-	public enum GameState : int
+	public enum AppState : int
 	{
-		GS_MENU = 0,
-		GS_GAME = 1,
-		GS_LOADING = 2,
+		AS_MENU = 0,
+		AS_GAME = 1,
+		AS_LOADING = 2,
 
-		GS_COUNT,
-		GS_NONE
+		AS_COUNT,
+		AS_NONE
 	}
 
 	public enum TransitionState
@@ -54,10 +54,10 @@ public class GameLord : MonoBehaviour
 	private TransitionState _currentTransitionState = TransitionState.TS_NONE;
 	bool IsTransition { get { return _currentTransitionState != TransitionState.TS_NONE; } }
 
-	private GameState _currentGameState = GameState.GS_NONE;
-	private GameState _targetGameState = GameState.GS_NONE;
-	public GameState CurrentGameState { get { return _currentGameState; } }
-	public static System.Action<GameState> OnGameStateChanged;
+	private AppState _currentGameState = AppState.AS_NONE;
+	private AppState _targetGameState = AppState.AS_NONE;
+	public AppState CurrentGameState { get { return _currentGameState; } }
+	public static System.Action<AppState> OnGameStateChanged;
 
 	[SerializeField]
 	private Image _fader = null;
@@ -71,7 +71,7 @@ public class GameLord : MonoBehaviour
 	[System.Serializable]
 	public struct StateInfo
 	{
-		public GameState state;
+		public AppState state;
 		public GameObject panelGO;
 	}
 
@@ -116,7 +116,7 @@ public class GameLord : MonoBehaviour
 
 	private void Validate()
 	{
-		_stateCount = (int)GameState.GS_COUNT;
+		_stateCount = (int)AppState.AS_COUNT;
 		StateInfo[] oldPanelInfos = _stateInfos;
 		int oldPanelCount = oldPanelInfos != null ? oldPanelInfos.Length : 0;
 
@@ -130,7 +130,7 @@ public class GameLord : MonoBehaviour
 			{
 				_stateInfos[i] = oldPanelInfos[i];
 			}
-			_stateInfos[i].state = (GameState)i;
+			_stateInfos[i].state = (AppState)i;
 		}
 	}
 
@@ -139,12 +139,12 @@ public class GameLord : MonoBehaviour
 		GameLord._instance = this;
 
 		_currentTransitionState = TransitionState.TS_NONE;
-		_targetGameState = GameState.GS_NONE;
+		_targetGameState = AppState.AS_NONE;
 
 		string loadedSceneName = SceneManager.GetActiveScene().name;
 		if(loadedSceneName == startSceneName)
 		{
-			_currentGameState = GameState.GS_MENU;
+			_currentGameState = AppState.AS_MENU;
 		} else {
 			bool foundAny = false;
 			for(int i = 0;i < _sceneNameCount;++i)
@@ -153,13 +153,13 @@ public class GameLord : MonoBehaviour
 				{
 					foundAny = true;
 					_currentSceneIndex = i;
-					_currentGameState = GameState.GS_GAME;
+					_currentGameState = AppState.AS_GAME;
 					break;
 				}
 			}
 			if(!foundAny)
 			{
-				_currentGameState = GameState.GS_NONE;
+				_currentGameState = AppState.AS_NONE;
 				Debug.LogErrorFormat("Scene {0} not added to GameLord!!!", loadedSceneName);
 			}
 		}
@@ -173,15 +173,15 @@ public class GameLord : MonoBehaviour
 	public void LoadLevel(int index)
 	{
 		_targetLevelIndex = index;
-		ChangeGameState(GameState.GS_LOADING);
+		ChangeGameState(AppState.AS_LOADING);
 	}
 
 	public void BackToMenu()
 	{
-		ChangeGameState(GameState.GS_MENU);
+		ChangeGameState(AppState.AS_MENU);
 	}
 
-	private void ChangeGameState(GameState newGameState)
+	private void ChangeGameState(AppState newGameState)
 	{
 		if(newGameState != _currentGameState)
 		{
@@ -214,11 +214,11 @@ public class GameLord : MonoBehaviour
 	{
 		switch(_currentGameState)
 		{
-			case GameState.GS_MENU:
+			case AppState.AS_MENU:
 				break;
-			case GameState.GS_GAME:
+			case AppState.AS_GAME:
 				break;
-			case GameState.GS_LOADING:
+			case AppState.AS_LOADING:
 				if(_targetLevelIndex != -1)
 				{
 					if(_currentSceneIndex != -1)
@@ -234,11 +234,11 @@ public class GameLord : MonoBehaviour
 
 					if(_loadingAsyncOperation != null && _loadingAsyncOperation.isDone)
 					{
-						ChangeGameState(GameState.GS_GAME);
+						ChangeGameState(AppState.AS_GAME);
 					}
 				}
 				break;
-			case GameState.GS_NONE:
+			case AppState.AS_NONE:
 				break;
 		}
 	}
@@ -263,7 +263,7 @@ public class GameLord : MonoBehaviour
 					SetPanelActive(_currentGameState, false);
 					SetPanelActive(_targetGameState, true);
 					_currentGameState = _targetGameState;
-					_targetGameState = GameState.GS_NONE;
+					_targetGameState = AppState.AS_NONE;
 
 					_currentTransitionState = TransitionState.TS_IN;
 				} else {
@@ -297,7 +297,7 @@ public class GameLord : MonoBehaviour
 		}
 	}
 
-	private void SetPanelActive(GameState gameState, bool active)
+	private void SetPanelActive(AppState gameState, bool active)
 	{
 		int index = (int)gameState;
 		if(_stateInfos != null && index >= 0 && index < _stateCount && _stateInfos[index].panelGO != null)
