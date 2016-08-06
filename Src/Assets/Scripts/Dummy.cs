@@ -77,8 +77,7 @@ public class Dummy : MonoBehaviour
 
 	void Start ()
 	{
-        initialPosition = this.transform.position;
-        _rigidbody = GetComponent<Rigidbody>();
+        initialPosition = _transform.position;
 	}
 
 	public void OnCollisionEnter(Collision collision)
