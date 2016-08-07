@@ -116,10 +116,8 @@ public class Dummy : MonoBehaviour
 	public void OnTriggerEnter(Collider other)
 	{
 		//Debug.LogFormat("Tag: {0}", other.tag);
-		{ 
 		if (other.tag == "Call" && !dead && AiState != DummyAIState.Wow && AiState != DummyAIState.Arrived && AiState != DummyAIState.OnFire)
-
-
+		{ 
 			_targetPosition = other.gameObject.transform.parent.position;
 			_targetDirection = (_targetPosition - _transform.position).normalized;
 
@@ -308,7 +306,7 @@ public class Dummy : MonoBehaviour
 
 					_followState_walkSpeed -= _followState_breakFactor * deltaTime;
 
-					if (_followState_initialWalkSpeed <= _followState_stopTreshold)
+					if (_followState_walkSpeed <= _followState_stopTreshold)
 					{
 						ChangeState(DummyAIState.Idle);
 					} else {

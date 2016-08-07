@@ -276,7 +276,7 @@ public class GameManager : MonoBehaviour
 	{
 		int arrivedCount = _crowController.GetArrivedCount(); 
 
-		if(arrivedCount > CrowdController.crowdSize / 2)
+		if(arrivedCount > 45)
 		{
 			Points += arrivedCount * 2;
 

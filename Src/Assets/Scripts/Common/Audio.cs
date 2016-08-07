@@ -62,10 +62,10 @@ public class Audio : MonoBehaviour
 		_audioSourceObjectPool = new AudioSourceObjectPool(_transform, 24);
 		int sourceCount = _audioSourceObjectPool.Size;
 		AudioSource[] sources = _audioSourceObjectPool.Pool;
-		for(int i = 0;i < sourceCount;++i)
-		{
-			UnityEngine.SceneManagement.SceneManager.MoveGameObjectToScene(sources[i].gameObject, startScene);
-		}
+		//for(int i = 0;i < sourceCount;++i)
+		//{
+		//	UnityEngine.SceneManagement.SceneManager.MoveGameObjectToScene(sources[i].gameObject, startScene);
+		//}
 
 		if (_music)
 		{
