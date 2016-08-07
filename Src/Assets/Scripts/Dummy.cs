@@ -10,6 +10,7 @@ public enum DummyAIState : int
     Wow = 4,
     OnFire = 5,
 	Dying = 6,
+	Arrived = 7,
 
 	Count,
 	None
@@ -59,7 +60,14 @@ public class Dummy : MonoBehaviour
     private float _fireState_interval = 10.0f;
     private float _fireState_walkSpeed = 10.0f;
 
+	private float _arrivedState_interval = 4.0f;
+	private float _arrivedState_radiusMin = 2.0f;
+	private float _arrivedState_radiusMax = 8.0f;
+	private float _arrivedState_radius = 0.0f;
+	private float _arrivedState_walkSpeed = 2.0f;
+
 	private Vector3 _exhibitPosition = Vector3.zero;
+	private Vector3 _finishPosition = Vector3.zero;
 
 	private int _playerLayer = 0;
 
@@ -108,8 +116,9 @@ public class Dummy : MonoBehaviour
 	public void OnTriggerEnter(Collider other)
 	{
 		//Debug.LogFormat("Tag: {0}", other.tag);
-        if (other.tag == "Call" && !dead && AiState != DummyAIState.Wow && AiState != DummyAIState.OnFire)
-		{
+		{ 
+		if (other.tag == "Call" && !dead && AiState != DummyAIState.Wow && AiState != DummyAIState.Arrived && AiState != DummyAIState.OnFire)
+
 
 			_targetPosition = other.gameObject.transform.parent.position;
 			_targetDirection = (_targetPosition - _transform.position).normalized;
@@ -145,6 +154,11 @@ public class Dummy : MonoBehaviour
             _targetPosition.y = this.transform.position.y;
             ChangeState(DummyAIState.OnFire);
         }
+		if (other.tag == "Finish")
+		{
+			_finishPosition = other.gameObject.transform.position;
+			ChangeState(DummyAIState.Arrived);
+		}
 	}
 
 	void Update()
@@ -230,11 +244,22 @@ public class Dummy : MonoBehaviour
             case DummyAIState.OnFire:
                 break;
 			case DummyAIState.Wow:
-				float randomValue = Random.value;
-				float randomRange = Random.Range(_wowState_minRadius, _wowState_maxRadius);
-				_targetPosition = _exhibitPosition + new Vector3(Mathf.Sin(randomValue * Mathf.PI * 2.0f) * randomRange, 0.0f, Mathf.Cos(randomValue * Mathf.PI * 2.0f) * randomRange);
+				{
+					float randomValue = Random.value;
+					float randomRange = Random.Range(_wowState_minRadius, _wowState_maxRadius);
+					_targetPosition = _exhibitPosition + new Vector3(Mathf.Sin(randomValue * Mathf.PI * 2.0f) * randomRange, 0.0f, Mathf.Cos(randomValue * Mathf.PI * 2.0f) * randomRange);
+				}
 				break;
 			case DummyAIState.Dying:
+				break;
+			case DummyAIState.Arrived:
+				{
+					float randomValue = Random.value;
+					float randomRange = Random.Range(_arrivedState_radiusMin, _arrivedState_radiusMax);
+					_targetPosition = _finishPosition + new Vector3(Mathf.Sin(randomValue * Mathf.PI * 2.0f) * randomRange, 0.0f, Mathf.Cos(randomValue * Mathf.PI * 2.0f) * randomRange);
+
+					CrowdController.instance.UpdateCrowdCounter();
+				}
 				break;
 		}
 	}
@@ -294,13 +319,14 @@ public class Dummy : MonoBehaviour
 			case DummyAIState.Confusion:
 				break;
             case DummyAIState.OnFire:
-                if(_stateTimer > _fireState_interval)
-                {
-                    _stateTimer = 0.0f;
-                    ChangeState(DummyAIState.Idle);
-                    break;
-                }
-               
+				{
+					if (_stateTimer > _fireState_interval)
+					{
+						_stateTimer = 0.0f;
+						ChangeState(DummyAIState.Idle);
+						break;
+					}
+
 
 					Vector3 boom = _targetPosition - _transform.position;
 					float distance = boom.magnitude;
@@ -309,13 +335,14 @@ public class Dummy : MonoBehaviour
 						Vector3 direction = boom.normalized;
 
 						Vector3 forward = _transform.forward;
-						forward = Vector3.RotateTowards(forward, direction * Random.Range(-5,5), _roamState_maxRoationSpeed * deltaTime, _roamState_maxRoationSpeed * deltaTime);
+						forward = Vector3.RotateTowards(forward, direction * Random.Range(-5, 5), _roamState_maxRoationSpeed * deltaTime, _roamState_maxRoationSpeed * deltaTime);
 						_transform.forward = forward;
 
 						Vector3 dummyPosition = _transform.position;
 						_rigidbody.MovePosition(dummyPosition + forward * _fireState_walkSpeed * deltaTime);
 					}
-                    break;
+					break;
+				}
 			case DummyAIState.Wow:
 				{
 					//wowStateTimer -= Time.deltaTime;
@@ -356,6 +383,34 @@ public class Dummy : MonoBehaviour
 				}
 				break;
 			case DummyAIState.Dying:
+				break;
+			case DummyAIState.Arrived:
+				{
+					if (_stateTimer > _arrivedState_interval)
+					{
+						_stateTimer = 0.0f;
+
+						float randomValue = Random.value;
+						float randomRange = Random.Range(_arrivedState_radiusMin, _arrivedState_radiusMax);
+						_targetPosition = _finishPosition + new Vector3(Mathf.Sin(randomValue * Mathf.PI * 2.0f) * randomRange, 0.0f, Mathf.Cos(randomValue * Mathf.PI * 2.0f) * randomRange);
+					}
+
+					Vector3 boom = _targetPosition - _transform.position;
+					float distance = boom.magnitude;
+					if (distance > 0.5f)
+					{
+						Vector3 direction = boom.normalized;
+						direction.y = 0.0f;
+						direction.Normalize();
+
+						Vector3 forward = _transform.forward;
+						forward = Vector3.RotateTowards(forward, direction, _roamState_maxRoationSpeed * deltaTime, _roamState_maxRoationSpeed * deltaTime);
+						_transform.forward = forward;
+
+						Vector3 dummyPosition = _transform.position;
+						_rigidbody.MovePosition(dummyPosition + forward * _arrivedState_walkSpeed * deltaTime);
+					}
+				}
 				break;
 		}
 	}

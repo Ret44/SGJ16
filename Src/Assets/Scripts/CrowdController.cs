@@ -53,6 +53,9 @@ public class CrowdController : MonoBehaviour
 
 	private ComponentBasedObjectPool<Dummy> _dummyPool= null;
 
+	[SerializeField]
+	private TextMesh _couterTextMesh = null;
+
 	#endregion Variables
 
 	#region Monobehaviour Methods
@@ -166,51 +169,56 @@ public class CrowdController : MonoBehaviour
 			_dummyAiStateInfos[i].stateCount = 0;
 		}
 
-		for(int i = 0;i < crowdSize;++i)
+		if (_dummies != null)
 		{
-			if (!_dummies[i].dead)
+			for (int i = 0; i < crowdSize; ++i)
 			{
-				int dummyStateIndex = (int)_dummies[i].AiState;
+				if (_dummies[i] != null && !_dummies[i].dead)
+				{
+					int dummyStateIndex = (int)_dummies[i].AiState;
 
-				++_dummyAiStateInfos[dummyStateIndex].stateCount;
+					++_dummyAiStateInfos[dummyStateIndex].stateCount;
+				}
 			}
-		}
 
-		int currentMaxStateIndex = -1;
-		int currentMax = 0;
-		for(int i = 0;i < _dummyAiStateInfoCount;++i)
-		{
-			if(currentMax < _dummyAiStateInfos[i].stateCount)
+			int currentMaxStateIndex = -1;
+			int currentMax = 0;
+			for (int i = 0; i < _dummyAiStateInfoCount; ++i)
 			{
-				currentMaxStateIndex = i;
-				currentMax = _dummyAiStateInfos[i].stateCount;
-            }
-		}
+				if (currentMax < _dummyAiStateInfos[i].stateCount)
+				{
+					currentMaxStateIndex = i;
+					currentMax = _dummyAiStateInfos[i].stateCount;
+				}
+			}
 
-		float bennyFactor = Mathf.Clamp01( _dummyAiStateInfos[(int)DummyAIState.Follow].stateCount / (float)_dummyCount );
-		Audio.Instance.SetMusicVolume(bennyFactor);
+			float bennyFactor = Mathf.Clamp01(_dummyAiStateInfos[(int)DummyAIState.Follow].stateCount / (float)_dummyCount);
+			Audio.Instance.SetMusicVolume(bennyFactor);
 
-		if(currentMaxStateIndex != -1)
-		{
-			DummyAIState choosenState = (DummyAIState)currentMaxStateIndex;
-
-
-			if(_lastChoosenDummyAIState == choosenState)
+			if (currentMaxStateIndex != -1)
 			{
-				_soundTimer += Time.deltaTime;
-				if(_soundTimer > _soundTimeInterval)
+				DummyAIState choosenState = (DummyAIState)currentMaxStateIndex;
+
+
+				if (_lastChoosenDummyAIState == choosenState)
+				{
+					_soundTimer += Time.deltaTime;
+					if (_soundTimer > _soundTimeInterval)
+					{
+						_soundTimer = 0.0f;
+						_soundTimeInterval = Random.Range(_soundIntervalMin, _soundIntervalMax);
+
+						Audio.Instance.PlaySound(_dummyAiStateInfos[currentMaxStateIndex].stateSounds);
+					}
+				}
+				else
 				{
 					_soundTimer = 0.0f;
 					_soundTimeInterval = Random.Range(_soundIntervalMin, _soundIntervalMax);
-
-					Audio.Instance.PlaySound(_dummyAiStateInfos[currentMaxStateIndex].stateSounds);
 				}
-			} else {
-				_soundTimer = 0.0f;
-				_soundTimeInterval = Random.Range(_soundIntervalMin, _soundIntervalMax);
-			}
 
-			_lastChoosenDummyAIState = choosenState;
+				_lastChoosenDummyAIState = choosenState;
+			}
 		}
 	}
 
@@ -227,6 +235,29 @@ public class CrowdController : MonoBehaviour
 		result += transform.forward * _spaceDistance * rowIndex + transform.right * _spaceDistance * columnIndex;
 
 		return result;
+	}
+
+	public int GetArrivedCount()
+	{
+		int result = 0;
+		for(int i = 0;i < crowdSize;++i)
+		{
+			if(_dummies[i].AiState == DummyAIState.Arrived)
+			{
+				++result;
+			}
+		}
+		return result;
+	}
+
+	public void UpdateCrowdCounter()
+	{
+		if(_couterTextMesh != null)
+		{
+			int couter = GetArrivedCount();
+
+			_couterTextMesh.text = string.Format("{0}", couter);
+		}
 	}
 
 	#endregion Methpds
