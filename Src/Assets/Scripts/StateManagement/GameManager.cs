@@ -76,23 +76,24 @@ public class GameManager : MonoBehaviour
 
 		_currentGameState = GameState.GS_NONE;
 
-		ChangeGameState(GameState.GS_NONE);
-
 		_crowController = GameObject.FindObjectOfType<CrowdController>();
 
 		_player = GameObject.FindObjectOfType<Player>();
+
+		ChangeGameState(GameState.GS_NONE);
     }
 	
 	public void ChangeGameState(GameState newGameState)
 	{
 		_currentGameState = newGameState;
+
+		_crowController.ResetCrowdController();
+
 		NotifyOnGameStateChanged();
 	}
 
 	public void RestartLevel()
 	{
-
-
 		bool reload = true;
 		if (reload)
 		{
@@ -184,6 +185,7 @@ public class GameManager : MonoBehaviour
 				break;
 		}
 	}
+
 
 	public void UpdateTimeScale()
 	{

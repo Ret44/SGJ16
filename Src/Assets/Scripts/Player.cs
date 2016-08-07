@@ -2,7 +2,8 @@
 using System.Collections;
 using DG.Tweening;
 
-public class Player : MonoBehaviour {
+public class Player : MonoBehaviour
+{
 
     public static Player instance;
 
