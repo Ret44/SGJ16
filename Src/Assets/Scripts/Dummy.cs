@@ -104,7 +104,7 @@ public class Dummy : MonoBehaviour
 	public void OnTriggerEnter(Collider other)
 	{
 		//Debug.LogFormat("Tag: {0}", other.tag);
-		if (other.tag == "Call" && !dead)
+		if (other.tag == "Call" && !dead && AiState != DummyAIState.Wow)
 		{
 
 			_targetPosition = other.gameObject.transform.parent.position;
