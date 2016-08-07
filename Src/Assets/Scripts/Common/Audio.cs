@@ -67,9 +67,10 @@ public class Audio : MonoBehaviour
 		//	UnityEngine.SceneManagement.SceneManager.MoveGameObjectToScene(sources[i].gameObject, startScene);
 		//}
 
-		if (_music)
+		if (_music != null)
 		{
 			_musicSource = this.gameObject.AddComponent<AudioSource>();
+			_musicSource.clip = _music;
 			_musicSource.loop = true;
 			_musicSource.Play();
 			_musicSource.volume = 0.0f;

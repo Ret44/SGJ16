@@ -50,7 +50,7 @@ public class Dummy : MonoBehaviour
 	private float _followState_breakFactor = 0.2f;
 	private float _followState_walkSpeed = 0.0f;
 	private float _followState_initialWalkSpeed = 5.0f;
-	private float _followState_stopTreshold = 0.2f;
+	private float _followState_stopTreshold = 0.75f;
 
 	private float _wowState_interval = 3.0f;
 	private float _wowState_minRadius = 4.0f;

@@ -35,11 +35,7 @@ public class GamepadContoller : MonoBehaviour
 		
         player.input = input;
 
-        if(Input.GetButtonDown("Call")
-#if UNITY_EDITOR
-			|| Input.GetKeyDown(KeyCode.Space)
-#endif
-			)
+        if(Input.GetButtonDown("Call") || Input.GetKeyDown(KeyCode.Space) )
         {
             player.SendCall();
         }

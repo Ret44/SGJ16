@@ -192,7 +192,7 @@ public class CrowdController : MonoBehaviour
 				}
 			}
 
-			float bennyFactor = Mathf.Clamp01(_dummyAiStateInfos[(int)DummyAIState.Follow].stateCount / (float)_dummyCount);
+			float bennyFactor = Mathf.Clamp01(_dummyAiStateInfos[(int)DummyAIState.Follow].stateCount / (float)crowdSize);
 			Audio.Instance.SetMusicVolume(bennyFactor);
 
 			if (currentMaxStateIndex != -1)
