@@ -39,6 +39,8 @@ public class GameManager : MonoBehaviour
 
 	private bool _eventsConnected = false;
 
+	private int _score = 0;
+
 	#endregion Variables
 
 	#region Monobehaviour Methods
