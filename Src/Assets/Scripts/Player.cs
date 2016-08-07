@@ -12,9 +12,11 @@ public enum PlayerState : int
     None
 }
 
-public class Player : MonoBehaviour {
+public class Player : MonoBehaviour
+{
+	#region Variables
 
-    public static Player instance;
+	public static Player instance;
     public PlayerState state;
  //   public GameObject playerModel;
     public Transform sphereTransform;
@@ -25,7 +27,7 @@ public class Player : MonoBehaviour {
     public float range;
     public float HP;
     public float speed;
-    public Vector3 velocity;
+    public Vector3 input;
 
     public Vector3 targetScale;
     public GameObject objective;
@@ -40,9 +42,12 @@ public class Player : MonoBehaviour {
     [SerializeField]
     private float _stateTimer;
 
+	private float _maxRotationRate = Mathf.PI * 1.5f;
+
+	[SerializeField]
+	private Transform _transform = null;
     [SerializeField]
     private Rigidbody _rigidbody;
-
 
     [System.Serializable]
     public struct PlayerStateInfo
@@ -57,10 +62,14 @@ public class Player : MonoBehaviour {
     [SerializeField]
     private int _stateCount = 0;
 
-    //[SerializeField]
-    //private Transform _callObject;
-    
-    public void Awake()
+	//[SerializeField]
+	//private Transform _callObject;
+
+	#endregion Variables
+
+	#region Monobehaviour Methods
+
+	public void Awake()
     {
         instance = this;
      //   targetScale = _callObject.transform.localScale;
@@ -69,11 +78,20 @@ public class Player : MonoBehaviour {
         _rigidbody = this.GetComponent<Rigidbody>();
     }
 
-    public void CallEnd()
+
+	public void Update()
+	{
+		ProcessStates();
+
+	}
+	#endregion Monbehaviour Methods
+
+	#region Methods
+
+	public void CallEnd()
     {
         sphereTransform.localScale = new Vector3(0f, 1f, 0f);
-        sphereCollider.enabled = false;
-       
+		sphereCollider.enabled = false;
     }
 
     public void CallFinished()
@@ -90,6 +108,8 @@ public class Player : MonoBehaviour {
     {
         if (!dead)
         {
+			targetScale = Vector3.one;
+
             sphereTransform.DOScaleX(range, 0.5f);
             sphereTransform.DOScaleZ(range, 0.5f).OnComplete(CallEnd);
 
@@ -147,14 +167,23 @@ public class Player : MonoBehaviour {
 
     void ProcessStates()
     {
+		float deltaTime = Time.deltaTime;
+
         switch(state)
         {
             case PlayerState.Roam:
             case PlayerState.Call:
-                Vector3 translateVector = velocity * speed * Time.deltaTime;
+                Vector3 translateVector = input * speed * Time.deltaTime;
                 
-               _rigidbody.MovePosition(translateVector);
-            //
+               //_rigidbody.MovePosition(translateVector);
+				//
+				Vector3 position = this.transform.position;
+				position += input * speed * deltaTime;
+				this.transform.position = position;
+
+				Vector3 forward = _transform.forward;
+				forward = Vector3.RotateTowards(forward, input, _maxRotationRate * deltaTime, 0.0f);
+				_transform.forward = forward;
                
                 
             //    if (translateVector != Vector3.zero)
@@ -184,9 +213,5 @@ public class Player : MonoBehaviour {
         Camera.main.transform.position = this.transform.position - _cameraOffset;
     }
 
-    public void Update()
-    {
-        ProcessStates();
-
-    }
+	#endregion Methods
 }

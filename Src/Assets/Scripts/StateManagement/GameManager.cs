@@ -41,6 +41,8 @@ public class GameManager : MonoBehaviour
 
 	private int _score = 0;
 
+	public static System.Action OnGameReset;
+
 	#endregion Variables
 
 	#region Monobehaviour Methods
@@ -104,6 +106,11 @@ public class GameManager : MonoBehaviour
 			if (_player != null)
 			{
 				//_player.ResetPlayer();
+			}
+
+			if(OnGameReset != null)
+			{
+				OnGameReset();
 			}
 
 			CrowdController.ResetAll();
