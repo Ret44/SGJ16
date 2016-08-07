@@ -8,7 +8,8 @@ public enum DummyAIState : int
     Follow = 2,
     Confusion = 3,
     Wow = 4,
-	Dying = 5,
+    OnFire = 5,
+	Dying = 6,
 
 	Count,
 	None
@@ -54,6 +55,9 @@ public class Dummy : MonoBehaviour
 	private float _wowState_minRadius = 4.0f;
 	private float _wowState_maxRadius = 10.0f;
 	private float _wowState_walkSpeed = 6.0f;
+
+    private float _fireState_interval = 10.0f;
+    private float _fireState_walkSpeed = 10.0f;
 
 	private Vector3 _exhibitPosition = Vector3.zero;
 
@@ -104,7 +108,7 @@ public class Dummy : MonoBehaviour
 	public void OnTriggerEnter(Collider other)
 	{
 		//Debug.LogFormat("Tag: {0}", other.tag);
-		if (other.tag == "Call" && !dead && AiState != DummyAIState.Wow)
+        if (other.tag == "Call" && !dead && AiState != DummyAIState.Wow && AiState != DummyAIState.OnFire)
 		{
 
 			_targetPosition = other.gameObject.transform.parent.position;
@@ -114,7 +118,7 @@ public class Dummy : MonoBehaviour
 			//this.transform.LookAt(followPosition);
 			//speed = runningSpeed;
 		}
-		if (other.tag == "Objective" && !dead)
+        if (other.tag == "Objective" && !dead && AiState != DummyAIState.OnFire)
 		{
 			_targetPosition = other.gameObject.transform.parent.position;
 			ChangeState(DummyAIState.Wow);
@@ -122,7 +126,7 @@ public class Dummy : MonoBehaviour
 			//wowStateTimer = 2f;
 			//dummyModel.LookAt(other.transform.position);
 		}
-		if(other.tag == "Exhibition")
+        if (other.tag == "Exhibition" && AiState != DummyAIState.OnFire)
 		{
 			ExhibitController exhibitionController = other.gameObject.GetComponent<ExhibitController>();
 			if(exhibitionController != null)
@@ -134,6 +138,12 @@ public class Dummy : MonoBehaviour
 					ChangeState(DummyAIState.Wow);
 				}
 			}
+        }
+        if(other.tag == "Fire")
+        {
+            _targetPosition = Random.onUnitSphere;
+            _targetPosition.y = this.transform.position.y;
+            ChangeState(DummyAIState.OnFire);
         }
 	}
 
@@ -217,6 +227,8 @@ public class Dummy : MonoBehaviour
 				break;
 			case DummyAIState.Confusion:
 				break;
+            case DummyAIState.OnFire:
+                break;
 			case DummyAIState.Wow:
 				float randomValue = Random.value;
 				float randomRange = Random.Range(_wowState_minRadius, _wowState_maxRadius);
@@ -281,6 +293,29 @@ public class Dummy : MonoBehaviour
 				break;
 			case DummyAIState.Confusion:
 				break;
+            case DummyAIState.OnFire:
+                if(_stateTimer > _fireState_interval)
+                {
+                    _stateTimer = 0.0f;
+                    ChangeState(DummyAIState.Idle);
+                    break;
+                }
+               
+
+					Vector3 boom = _targetPosition - _transform.position;
+					float distance = boom.magnitude;
+					if (distance > 0.5f)
+					{
+						Vector3 direction = boom.normalized;
+
+						Vector3 forward = _transform.forward;
+						forward = Vector3.RotateTowards(forward, direction * Random.Range(-5,5), _roamState_maxRoationSpeed * deltaTime, _roamState_maxRoationSpeed * deltaTime);
+						_transform.forward = forward;
+
+						Vector3 dummyPosition = _transform.position;
+						_rigidbody.MovePosition(dummyPosition + forward * _fireState_walkSpeed * deltaTime);
+					}
+                    break;
 			case DummyAIState.Wow:
 				{
 					//wowStateTimer -= Time.deltaTime;
@@ -305,11 +340,11 @@ public class Dummy : MonoBehaviour
 						_targetPosition = _exhibitPosition + new Vector3(Mathf.Sin(randomValue * Mathf.PI * 2.0f) * randomRange, 0.0f, Mathf.Cos(randomValue * Mathf.PI * 2.0f) * randomRange);
 					}
 
-					Vector3 boom = _targetPosition - _transform.position;
-					float distance = boom.magnitude;
-					if (distance > 0.5f)
+					Vector3 fBoom = _targetPosition - _transform.position;
+                    float fDistance = fBoom.magnitude;
+                    if (fDistance > 0.5f)
 					{
-						Vector3 direction = boom.normalized;
+                        Vector3 direction = fBoom.normalized;
 
 						Vector3 forward = _transform.forward;
 						forward = Vector3.RotateTowards(forward, direction, _roamState_maxRoationSpeed * deltaTime, _roamState_maxRoationSpeed * deltaTime);
