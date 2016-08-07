@@ -35,7 +35,7 @@ public class CrowdController : MonoBehaviour
 	private DummyAIState _lastChoosenDummyAIState = DummyAIState.None;
 	private float _soundTimer = 0.0f;
 	private float _soundTimeInterval = 0.0f;
-	private float _soundIntervalMin = 0.5f;
+	private float _soundIntervalMin = 0.6f;
 	private float _soundIntervalMax = 1.1f;
 
 	//[SerializeField]
@@ -166,11 +166,14 @@ public class CrowdController : MonoBehaviour
 			_dummyAiStateInfos[i].stateCount = 0;
 		}
 
-		for(int i = 0;i <_dummyCount;++i)
+		for(int i = 0;i < crowdSize;++i)
 		{
-			int dummyStateIndex = (int)dummies[i].AiState;
-			
-			++_dummyAiStateInfos[dummyStateIndex].stateCount;
+			if (!_dummies[i].dead)
+			{
+				int dummyStateIndex = (int)_dummies[i].AiState;
+
+				++_dummyAiStateInfos[dummyStateIndex].stateCount;
+			}
 		}
 
 		int currentMaxStateIndex = -1;
