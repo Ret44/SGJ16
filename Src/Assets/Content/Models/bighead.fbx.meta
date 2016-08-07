@@ -1,19 +1,19 @@
 fileFormatVersion: 2
-guid: e3992929516aedc4c8445eb30abdf3c2
-timeCreated: 1470517786
+guid: 6bd3c664b0ae3714c9ea97f5bced3f2b
+timeCreated: 1470523808
 licenseType: Free
 ModelImporter:
   serializedVersion: 19
   fileIDToRecycleName:
-    100000: Camera
-    100002: Cone.001
-    100004: //RootNode
-    400000: Camera
-    400002: Cone.001
-    400004: //RootNode
-    2300000: Cone.001
-    3300000: Cone.001
-    4300000: Cone.001
+    100000: //RootNode
+    100002: Camera
+    100004: Cube
+    400000: //RootNode
+    400002: Camera
+    400004: Cube
+    2300000: Cube
+    3300000: Cube
+    4300000: Cube
   materials:
     importMaterials: 1
     materialName: 0

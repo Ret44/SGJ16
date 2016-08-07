@@ -2,17 +2,20 @@
 using System.Collections;
 
 [RequireComponent(typeof(Player))]
-public class GamepadContoller : MonoBehaviour {
+public class GamepadContoller : MonoBehaviour
+{
 
     public Player player;
+
+	private Vector3 _forward = Vector3.zero;
+	private Vector3 _right = Vector3.zero;
 
     void Awake()
     {
         player = GetComponent<Player>();
-    }
-	// Use this for initialization
-	void Start () {
-	
+
+		_forward = new Vector3(-0.5f, 0.0f, 0.5f);
+		_right = new Vector3(0.5f, 0.0f, 0.5f);
 	}
 	
     bool ButtonPressed()
@@ -21,8 +24,16 @@ public class GamepadContoller : MonoBehaviour {
         return false;
     }
 	// Update is called once per frame
-	void Update () {
-        player.velocity = Vector3.zero + (new Vector3(Input.GetAxis("Horizontal"), 0, Input.GetAxis("Vertical")));
+	void Update ()
+	{
+		Vector3 input = Vector3.zero;
+
+		input += _right * Input.GetAxis("Horizontal");
+		input += _forward * Input.GetAxis("Vertical");
+
+		input.Normalize();
+		
+        player.input = input;
 
         if(Input.GetButtonDown("Call")
 #if UNITY_EDITOR
