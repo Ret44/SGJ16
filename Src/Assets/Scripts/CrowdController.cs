@@ -38,11 +38,11 @@ public class CrowdController : MonoBehaviour
 	private float _soundIntervalMin = 0.5f;
 	private float _soundIntervalMax = 1.1f;
 
-	[SerializeField]
-	private Vector3 _spawnPosition = Vector3.zero;
-	[SerializeField]
-	[Range(0.0f,1.0f)]
-	private float _spawnDirection = 0.0f;
+	//[SerializeField]
+	//private Vector3 _spawnPosition = Vector3.zero;
+	//[SerializeField]
+	//[Range(0.0f,1.0f)]
+	//private float _spawnDirection = 0.0f;
 	[SerializeField]
 	private int _spawnRowsSize = 1;
 	private float _spaceDistance = 2.0f;
@@ -218,10 +218,10 @@ public class CrowdController : MonoBehaviour
 		int columnIndex = Mathf.FloorToInt(index / _spawnRowsSize);
 		int rowIndex = index % _spawnRowsSize;
 
-		Vector3 forward = new Vector3(Mathf.Cos(_spawnDirection * Mathf.PI * 2.0f),0.0f, Mathf.Sin(_spawnDirection * Mathf.PI * 2.0f));
-		Vector3 right = new Vector3(Mathf.Cos((_spawnDirection + 0.25f) * Mathf.PI * 2.0f), 0.0f, Mathf.Sin( (_spawnDirection + 0.25f) * Mathf.PI * 2.0f));
+		//Vector3 forward = new Vector3(Mathf.Cos(_spawnDirection * Mathf.PI * 2.0f),0.0f, Mathf.Sin(_spawnDirection * Mathf.PI * 2.0f));
+		//Vector3 right = new Vector3(Mathf.Cos((_spawnDirection + 0.25f) * Mathf.PI * 2.0f), 0.0f, Mathf.Sin( (_spawnDirection + 0.25f) * Mathf.PI * 2.0f));
 
-		result += forward * _spaceDistance * rowIndex + right * _spaceDistance * columnIndex;
+		result += transform.forward * _spaceDistance * rowIndex + transform.right * _spaceDistance * columnIndex;
 
 		return result;
 	}
