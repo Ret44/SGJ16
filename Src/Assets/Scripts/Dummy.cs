@@ -19,8 +19,10 @@ public class Dummy : MonoBehaviour
 
 	[SerializeField]
 	private Transform _transform = null;
+	public Transform Transform {  get { return _transform; } }
 	[SerializeField]
     private Rigidbody _rigidbody = null;
+	public Rigidbody Rigidbody { get { return _rigidbody; } }
 
 	private Vector3 initialPosition;
 
