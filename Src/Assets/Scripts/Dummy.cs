@@ -9,6 +9,7 @@ public enum DummyAIState : int
     Confusion = 3,
     Wow = 4,
 	Dying = 5,
+	Arrived = 6,
 
 	Count,
 	None
@@ -55,7 +56,14 @@ public class Dummy : MonoBehaviour
 	private float _wowState_maxRadius = 10.0f;
 	private float _wowState_walkSpeed = 6.0f;
 
+	private float _arrivedState_interval = 4.0f;
+	private float _arrivedState_radiusMin = 2.0f;
+	private float _arrivedState_radiusMax = 8.0f;
+	private float _arrivedState_radius = 0.0f;
+	private float _arrivedState_walkSpeed = 2.0f;
+
 	private Vector3 _exhibitPosition = Vector3.zero;
+	private Vector3 _finishPosition = Vector3.zero;
 
 	private int _playerLayer = 0;
 
@@ -135,6 +143,11 @@ public class Dummy : MonoBehaviour
 				}
 			}
         }
+		if(other.tag == "Finish")
+		{
+			_finishPosition = other.gameObject.transform.position;
+			ChangeState(DummyAIState.Arrived);
+		}
 	}
 
 	void Update()
@@ -218,11 +231,20 @@ public class Dummy : MonoBehaviour
 			case DummyAIState.Confusion:
 				break;
 			case DummyAIState.Wow:
-				float randomValue = Random.value;
-				float randomRange = Random.Range(_wowState_minRadius, _wowState_maxRadius);
-				_targetPosition = _exhibitPosition + new Vector3(Mathf.Sin(randomValue * Mathf.PI * 2.0f) * randomRange, 0.0f, Mathf.Cos(randomValue * Mathf.PI * 2.0f) * randomRange);
+				{
+					float randomValue = Random.value;
+					float randomRange = Random.Range(_wowState_minRadius, _wowState_maxRadius);
+					_targetPosition = _exhibitPosition + new Vector3(Mathf.Sin(randomValue * Mathf.PI * 2.0f) * randomRange, 0.0f, Mathf.Cos(randomValue * Mathf.PI * 2.0f) * randomRange);
+				}
 				break;
 			case DummyAIState.Dying:
+				break;
+			case DummyAIState.Arrived:
+				{
+					float randomValue = Random.value;
+					float randomRange = Random.Range(_arrivedState_radiusMin, _arrivedState_radiusMax);
+					_targetPosition = _finishPosition + new Vector3(Mathf.Sin(randomValue * Mathf.PI * 2.0f) * randomRange, 0.0f, Mathf.Cos(randomValue * Mathf.PI * 2.0f) * randomRange);
+				}
 				break;
 		}
 	}
@@ -301,7 +323,7 @@ public class Dummy : MonoBehaviour
 						_stateTimer = 0.0f;
 
 						float randomValue = Random.value;
-						float randomRange = Random.Range(_wowState_maxRadius, _wowState_maxRadius);
+						float randomRange = Random.Range(_wowState_minRadius, _wowState_maxRadius);
 						_targetPosition = _exhibitPosition + new Vector3(Mathf.Sin(randomValue * Mathf.PI * 2.0f) * randomRange, 0.0f, Mathf.Cos(randomValue * Mathf.PI * 2.0f) * randomRange);
 					}
 
@@ -310,6 +332,8 @@ public class Dummy : MonoBehaviour
 					if (distance > 0.5f)
 					{
 						Vector3 direction = boom.normalized;
+						direction.y = 0.0f;
+						direction.Normalize();
 
 						Vector3 forward = _transform.forward;
 						forward = Vector3.RotateTowards(forward, direction, _roamState_maxRoationSpeed * deltaTime, _roamState_maxRoationSpeed * deltaTime);
@@ -321,6 +345,34 @@ public class Dummy : MonoBehaviour
 				}
 				break;
 			case DummyAIState.Dying:
+				break;
+			case DummyAIState.Arrived:
+				{
+					if (_stateTimer > _arrivedState_interval)
+					{
+						_stateTimer = 0.0f;
+
+						float randomValue = Random.value;
+						float randomRange = Random.Range(_arrivedState_radiusMin, _arrivedState_radiusMax);
+						_targetPosition = _finishPosition + new Vector3(Mathf.Sin(randomValue * Mathf.PI * 2.0f) * randomRange, 0.0f, Mathf.Cos(randomValue * Mathf.PI * 2.0f) * randomRange);
+					}
+
+					Vector3 boom = _targetPosition - _transform.position;
+					float distance = boom.magnitude;
+					if (distance > 0.5f)
+					{
+						Vector3 direction = boom.normalized;
+						direction.y = 0.0f;
+						direction.Normalize();
+
+						Vector3 forward = _transform.forward;
+						forward = Vector3.RotateTowards(forward, direction, _roamState_maxRoationSpeed * deltaTime, _roamState_maxRoationSpeed * deltaTime);
+						_transform.forward = forward;
+
+						Vector3 dummyPosition = _transform.position;
+						_rigidbody.MovePosition(dummyPosition + forward * _arrivedState_walkSpeed * deltaTime);
+					}
+				}
 				break;
 		}
 	}
