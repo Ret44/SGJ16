@@ -25,7 +25,14 @@ public class Player : MonoBehaviour
     public bool dead { get { return _dead; } }
 
     public float range;
-    public float HP;
+    private float _hp;
+	public float HP
+	{
+		get { return _hp; }
+		set { _hp = value; }
+	}
+	private float _maxHP = 30.0f;
+	private float _recoveryRate = 30.0f;
     public float speed;
     public Vector3 input;
 
@@ -81,8 +88,10 @@ public class Player : MonoBehaviour
 
 	public void Update()
 	{
-		ProcessStates();
-
+		if (GameManager.Instance.CurrentGameState == GameManager.GameState.GS_GAME)
+		{
+			ProcessStates();
+		}
 	}
 	#endregion Monbehaviour Methods
 
@@ -110,8 +119,8 @@ public class Player : MonoBehaviour
         {
 			targetScale = Vector3.one;
 
-            sphereTransform.DOScaleX(range, 0.5f);
-            sphereTransform.DOScaleZ(range, 0.5f).OnComplete(CallEnd);
+            sphereTransform.DOScaleX(range * 2.5f, 0.5f);
+            sphereTransform.DOScaleZ(range * 2.5f, 0.5f).OnComplete(CallEnd);
 
 			sphereCollider.radius = range;
             sphereCollider.enabled = true;
@@ -185,34 +194,39 @@ public class Player : MonoBehaviour
 				Vector3 forward = _transform.forward;
 				forward = Vector3.RotateTowards(forward, input, _maxRotationRate * deltaTime, 0.0f);
 				_transform.forward = forward;
-               
-                
-            //    if (translateVector != Vector3.zero)
-            //    {
-            //        Debug.Log(translateVector.ToString());
-            //        this.transform.Translate(translateVector);
-            //        SetCamera();
-            //        //this.transform.rotation = Quaternion.LookRotation(velocity);
-            //        Debug.DrawRay(this.transform.position, velocity, Color.red);
-            //    }
-               
-                
-               // this.transform.localPosition = Vector3.zero;
-                if (HP < 0)
-                    Die();
 
-                if (HP < 100)
-                    HP += 0.5f;
+
+				//    if (translateVector != Vector3.zero)
+				//    {
+				//        Debug.Log(translateVector.ToString());
+				//        this.transform.Translate(translateVector);
+				//        SetCamera();
+				//        //this.transform.rotation = Quaternion.LookRotation(velocity);
+				//        Debug.DrawRay(this.transform.position, velocity, Color.red);
+				//    }
+
+
+				// this.transform.localPosition = Vector3.zero;
+				if (_hp < 0.0f)
+				{
+					Die();
+				}
+
+				if (_hp < _maxHP)
+				{
+					_hp += _recoveryRate * deltaTime;
+				}
                 break;
             case PlayerState.Dead:
                 break;
         }
     }
 
-    void SetCamera()
-    {
-        Camera.main.transform.position = this.transform.position - _cameraOffset;
-    }
+	public void ResetPlayer()
+	{
+		_hp = _maxHP;
+		_dead = false;
+	}
 
 	#endregion Methods
 }

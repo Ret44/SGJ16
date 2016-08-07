@@ -108,7 +108,7 @@ public class GameManager : MonoBehaviour
 	{
 		_currentGameState = newGameState;
 
-		_crowController.ResetCrowdController();
+		//_crowController.ResetCrowdController();
 
 		NotifyOnGameStateChanged();
 	}
@@ -205,6 +205,7 @@ public class GameManager : MonoBehaviour
 		{
 			case GameLord.AppState.AS_GAME:
 				ChangeGameState(GameState.GS_GAME);
+				ResetGame();
 				break;
 			default:
 				ChangeGameState(GameState.GS_NONE);
@@ -261,7 +262,14 @@ public class GameManager : MonoBehaviour
 
 	public void ScorePoints(int points)
 	{
-		_points += points;
+		Points += points;
+	}
+
+	private void ResetGame()
+	{
+		Points = 0;
+		_crowController.ResetCrowdController();
+		_player.ResetPlayer();
 	}
 
 	#endregion Methods

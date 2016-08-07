@@ -43,17 +43,17 @@ public class Dummy : MonoBehaviour
 
 	private float _roamState_sideFactor = 0.4f;
 	private float _roamState_maxRoationSpeed = Mathf.PI;
-	private float _roamState_walkSpeed = 1.0f;
+	private float _roamState_walkSpeed = 2.0f;
 
 	private float _followState_breakFactor = 0.2f;
 	private float _followState_walkSpeed = 0.0f;
-	private float _followState_initialWalkSpeed = 3.0f;
+	private float _followState_initialWalkSpeed = 5.0f;
 	private float _followState_stopTreshold = 0.2f;
 
 	private float _wowState_interval = 3.0f;
 	private float _wowState_minRadius = 4.0f;
 	private float _wowState_maxRadius = 10.0f;
-	private float _wowState_walkSpeed = 3.0f;
+	private float _wowState_walkSpeed = 6.0f;
 
 	private Vector3 _exhibitPosition = Vector3.zero;
 
@@ -96,7 +96,7 @@ public class Dummy : MonoBehaviour
 			//if (this.speed > Player.instance.speed)
 			if (true)
 			{
-				Player.instance.HP -= 10;
+				Player.instance.HP -= 10.0f;
 			}
 		}
 	}
