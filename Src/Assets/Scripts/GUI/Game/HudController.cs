@@ -1,4 +1,5 @@
 ﻿using UnityEngine;
+using UnityEngine.UI;
 using System.Collections;
 
 public class HudController : MonoBehaviour
@@ -8,6 +9,9 @@ public class HudController : MonoBehaviour
 	private GameLord _gameLord = null;
 	private HudLord _hudLord = null;
 
+	[SerializeField]
+	private Text _scoreLabel = null;
+
 	#endregion Variables
 
 	#region Monobehaviour Methods
@@ -16,6 +20,16 @@ public class HudController : MonoBehaviour
 	{
 		InitHudController();
     }
+
+	void OnEnable()
+	{
+		GameManager.OnScoreChanged += HandleScoreChanged;
+    }
+
+	void OnDisable()
+	{
+		GameManager.OnScoreChanged -= HandleScoreChanged;
+	}
 
 	#endregion Monobehaviour Methods
 
@@ -35,6 +49,14 @@ public class HudController : MonoBehaviour
 			instance.ChangeGameState(GameManager.GameState.GS_PAUSE);
 		}
     }
+
+	private void HandleScoreChanged(int score)
+	{
+		if(_scoreLabel != null)
+		{
+			_scoreLabel.text = string.Format("{0}",score);
+		}
+	}
 
 	#endregion Methods
 }

@@ -39,7 +39,24 @@ public class GameManager : MonoBehaviour
 
 	private bool _eventsConnected = false;
 
-	private int _score = 0;
+	public static System.Action<int> OnScoreChanged;
+	private int _points = 0;
+	public int Points
+	{
+		get
+		{
+			return _points;
+		}
+		set
+		{
+			_points = value;
+			if(OnScoreChanged != null)
+			{
+				OnScoreChanged(_points);
+			}
+		}
+	}
+
 
 	public static System.Action OnGameReset;
 
@@ -240,6 +257,11 @@ public class GameManager : MonoBehaviour
 		}
 
 		_eventsConnected = state;
+	}
+
+	public void ScorePoints(int points)
+	{
+		_points += points;
 	}
 
 	#endregion Methods

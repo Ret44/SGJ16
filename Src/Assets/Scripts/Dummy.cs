@@ -50,6 +50,13 @@ public class Dummy : MonoBehaviour
 	private float _followState_initialWalkSpeed = 3.0f;
 	private float _followState_stopTreshold = 0.2f;
 
+	private float _wowState_interval = 3.0f;
+	private float _wowState_minRadius = 4.0f;
+	private float _wowState_maxRadius = 10.0f;
+	private float _wowState_walkSpeed = 3.0f;
+
+	private Vector3 _exhibitPosition = Vector3.zero;
+
 	private int _playerLayer = 0;
 
 	[System.Serializable]
@@ -96,6 +103,7 @@ public class Dummy : MonoBehaviour
 
 	public void OnTriggerEnter(Collider other)
 	{
+		//Debug.LogFormat("Tag: {0}", other.tag);
 		if (other.tag == "Call" && !dead)
 		{
 
@@ -114,6 +122,19 @@ public class Dummy : MonoBehaviour
 			//wowStateTimer = 2f;
 			//dummyModel.LookAt(other.transform.position);
 		}
+		if(other.tag == "Exhibition")
+		{
+			ExhibitController exhibitionController = other.gameObject.GetComponent<ExhibitController>();
+			if(exhibitionController != null)
+			{
+				if (exhibitionController.CurrentExhibitState != ExhibitController.ExhibitState.ES_USED)
+				{
+					exhibitionController.AddVisitor(this);
+					_exhibitPosition = exhibitionController.transform.position;
+					ChangeState(DummyAIState.Wow);
+				}
+			}
+        }
 	}
 
 	void Update()
@@ -174,7 +195,7 @@ public class Dummy : MonoBehaviour
 		}
 	}
 
-	private void ChangeState(DummyAIState newState)
+	public void ChangeState(DummyAIState newState)
 	{
 		SetModelActive(_aiState, false);
         
@@ -197,6 +218,9 @@ public class Dummy : MonoBehaviour
 			case DummyAIState.Confusion:
 				break;
 			case DummyAIState.Wow:
+				float randomValue = Random.value;
+				float randomRange = Random.Range(_wowState_minRadius, _wowState_maxRadius);
+				_targetPosition = _exhibitPosition + new Vector3(Mathf.Sin(randomValue * Mathf.PI * 2.0f) * randomRange, 0.0f, Mathf.Cos(randomValue * Mathf.PI * 2.0f) * randomRange);
 				break;
 			case DummyAIState.Dying:
 				break;
@@ -206,6 +230,7 @@ public class Dummy : MonoBehaviour
 	private void ProcessStates()
 	{
 		float deltaTime = Time.deltaTime;
+		_stateTimer += deltaTime;
 
 		switch (AiState)
 		{
@@ -216,19 +241,18 @@ public class Dummy : MonoBehaviour
 						ChangeState(DummyAIState.Roam);
                     }
 
-				 				}
+				 }
 				break;
 			case DummyAIState.Roam:
 				{
 					Vector3 forward = _transform.forward;
-					forward = Vector3.MoveTowards(forward, _targetDirection, _roamState_maxRoationSpeed * deltaTime);
+					forward = Vector3.RotateTowards(forward, _targetDirection, _roamState_maxRoationSpeed * deltaTime, _roamState_maxRoationSpeed * deltaTime);
 					_transform.forward = forward;
 
 					Vector3 dummyPosition = _transform.position;
 
 					_rigidbody.MovePosition(dummyPosition + forward * _roamState_walkSpeed * deltaTime);
 
-					_stateTimer = 0.0f;
 					if(_stateTimer > _stateLength_roam)
 					{
 						_stateTimer = 0.0f;
@@ -271,6 +295,29 @@ public class Dummy : MonoBehaviour
 					//{
 					//	ChangeState(DummyAIState.Idle);
 					//}
+
+					if(_stateTimer > _wowState_interval)
+					{
+						_stateTimer = 0.0f;
+
+						float randomValue = Random.value;
+						float randomRange = Random.Range(_wowState_maxRadius, _wowState_maxRadius);
+						_targetPosition = _exhibitPosition + new Vector3(Mathf.Sin(randomValue * Mathf.PI * 2.0f) * randomRange, 0.0f, Mathf.Cos(randomValue * Mathf.PI * 2.0f) * randomRange);
+					}
+
+					Vector3 boom = _targetPosition - _transform.position;
+					float distance = boom.magnitude;
+					if (distance > 0.5f)
+					{
+						Vector3 direction = boom.normalized;
+
+						Vector3 forward = _transform.forward;
+						forward = Vector3.RotateTowards(forward, direction, _roamState_maxRoationSpeed * deltaTime, _roamState_maxRoationSpeed * deltaTime);
+						_transform.forward = forward;
+
+						Vector3 dummyPosition = _transform.position;
+						_rigidbody.MovePosition(dummyPosition + forward * _wowState_walkSpeed * deltaTime);
+					}
 				}
 				break;
 			case DummyAIState.Dying:

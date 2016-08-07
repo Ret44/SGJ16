@@ -113,6 +113,7 @@ public class Player : MonoBehaviour
             sphereTransform.DOScaleX(range, 0.5f);
             sphereTransform.DOScaleZ(range, 0.5f).OnComplete(CallEnd);
 
+			sphereCollider.radius = range;
             sphereCollider.enabled = true;
             _stateInfos[(int)state].stateGO.transform.DOScale(0.5f, 0.25f).SetEase(Ease.InBounce).OnComplete(ModelTweenEnd);
 
