@@ -53,6 +53,9 @@ public class CrowdController : MonoBehaviour
 
 	private ComponentBasedObjectPool<Dummy> _dummyPool= null;
 
+	[SerializeField]
+	private TextMesh _couterTextMesh = null;
+
 	#endregion Variables
 
 	#region Monobehaviour Methods
@@ -168,7 +171,7 @@ public class CrowdController : MonoBehaviour
 
 		for(int i = 0;i < crowdSize;++i)
 		{
-			if (!_dummies[i].dead)
+			if (_dummies[i] != null && !_dummies[i].dead)
 			{
 				int dummyStateIndex = (int)_dummies[i].AiState;
 
@@ -227,6 +230,29 @@ public class CrowdController : MonoBehaviour
 		result += transform.forward * _spaceDistance * rowIndex + transform.right * _spaceDistance * columnIndex;
 
 		return result;
+	}
+
+	public int GetArrivedCount()
+	{
+		int result = 0;
+		for(int i = 0;i < crowdSize;++i)
+		{
+			if(_dummies[i].AiState == DummyAIState.Arrived)
+			{
+				++result;
+			}
+		}
+		return result;
+	}
+
+	public void UpdateCrowdCounter()
+	{
+		if(_couterTextMesh != null)
+		{
+			int couter = GetArrivedCount();
+
+			_couterTextMesh.text = string.Format("{0}", couter);
+		}
 	}
 
 	#endregion Methpds

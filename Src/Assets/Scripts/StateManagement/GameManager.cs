@@ -272,5 +272,19 @@ public class GameManager : MonoBehaviour
 		_player.ResetPlayer();
 	}
 
+	public void TryFinish()
+	{
+		int arrivedCount = _crowController.GetArrivedCount(); 
+
+		if(arrivedCount > CrowdController.crowdSize / 2)
+		{
+			Points += arrivedCount * 2;
+
+			ChangeGameState(GameState.GS_WAIT_WIN);
+		} else {
+			ChangeGameState(GameState.GS_WAIT_LOST);
+		}
+	}
+
 	#endregion Methods
 }

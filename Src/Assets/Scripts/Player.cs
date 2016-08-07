@@ -93,6 +93,20 @@ public class Player : MonoBehaviour
 			ProcessStates();
 		}
 	}
+
+	void OnTriggerEnter(Collider other)
+	{
+		if(other.tag == "Finish")
+		{
+			BoxCollider tmpCollider = other.gameObject.GetComponent<BoxCollider>(); 
+			if(tmpCollider != null)
+			{
+				
+			}
+			GameManager.Instance.TryFinish();
+		}
+	}
+
 	#endregion Monbehaviour Methods
 
 	#region Methods

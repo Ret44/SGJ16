@@ -112,7 +112,7 @@ public class Dummy : MonoBehaviour
 	public void OnTriggerEnter(Collider other)
 	{
 		//Debug.LogFormat("Tag: {0}", other.tag);
-		if (other.tag == "Call" && !dead && AiState != DummyAIState.Wow)
+		if (other.tag == "Call" && !dead && AiState != DummyAIState.Wow && AiState != DummyAIState.Arrived)
 		{
 
 			_targetPosition = other.gameObject.transform.parent.position;
@@ -244,6 +244,8 @@ public class Dummy : MonoBehaviour
 					float randomValue = Random.value;
 					float randomRange = Random.Range(_arrivedState_radiusMin, _arrivedState_radiusMax);
 					_targetPosition = _finishPosition + new Vector3(Mathf.Sin(randomValue * Mathf.PI * 2.0f) * randomRange, 0.0f, Mathf.Cos(randomValue * Mathf.PI * 2.0f) * randomRange);
+
+					CrowdController.instance.UpdateCrowdCounter();
 				}
 				break;
 		}
