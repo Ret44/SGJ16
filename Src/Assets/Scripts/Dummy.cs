@@ -175,9 +175,11 @@ public class Dummy : MonoBehaviour
 	private void ChangeState(DummyAIState newState)
 	{
 		SetModelActive(_aiState, false);
+        
+        _aiState = newState;
 		SetModelActive(_aiState, true);
 
-		_aiState = newState;
+		
 		_stateTimer = 0.0f;
 
 		switch(_aiState)
@@ -212,12 +214,7 @@ public class Dummy : MonoBehaviour
 						ChangeState(DummyAIState.Roam);
                     }
 
-					//speed = idleSpeed;
-					//Vector3 dir = Random.insideUnitSphere * 2;
-					//velocity = new Vector3(Mathf.Lerp(velocity.x, dir.x, 0.1f), 0f, Mathf.Lerp(velocity.z, dir.z, 0.1f));
-					//this.transform.Translate(velocity * speed * Time.deltaTime);
-					//this.transform.rotation = Quaternion.Lerp(this.transform.rotation, Quaternion.LookRotation(velocity), 0.01f);
-				}
+				 				}
 				break;
 			case DummyAIState.Roam:
 				{
